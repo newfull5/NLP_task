@@ -19,6 +19,9 @@ class QADataset(Dataset):
         dataset = dataset[self.stage]
 
         for i in range(len(dataset)):
+            if not dataset[i]['answers']['text']:
+                continue
+
             context = dataset[i]['context']
             question = dataset[i]['question']
 
