@@ -46,5 +46,3 @@ class QADataset(Dataset):
 
     def __getitem__(self, idx):
         return self.questions_contexts[idx], self.answers[idx]
-
-QADataset(dataset_name='squad_v2', stage='train')

@@ -1,10 +1,10 @@
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from transformers import AutoModelForQuestionAnswering
 import torch
 import torch.nn as nn
 
 
 class Model(nn.Module):
-    def __init__(self, model_name, num_label):
+    def __init__(self, model_name):
         super(Model, self).__init__()
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
 
