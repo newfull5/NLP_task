@@ -1,51 +1,62 @@
 from transformers import AutoTokenizer
-from torch.utils.data import Dataset
 from datasets import load_dataset
+from tqdm import tqdm
 import torch
+import multiprocessing as mp
 
 
-class QADataset(Dataset):
-    def __init__(self, dataset_name, tokenizer_name, stage):
+class Dataset:
+    def __init__(self, dataset_name, tokenizer_name, stage, batch_size):
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
         self.stage = stage
+        self.batch_size = batch_size
         self.dataset_name = dataset_name
         self.questions_contexts = []
         self.answers_span = []
-        self._preproc_dataset()
+        self.columns_to_return = ['input_ids', 'token_type_ids', 'attention_mask', 'start_positions', 'end_positions']
 
-    def _preproc_dataset(self):
+    def preproc_dataset(self):
         dataset = load_dataset(self.dataset_name)
         dataset = dataset[self.stage]
+        dataset = dataset.map(self._convert_to_features, batched=True, batch_size=self.batch_size)
+        dataset.set_format(type='torch', columns=self.columns_to_return)
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, num_workers=mp.cpu_count())
 
-        for i in range(len(dataset)):
-            if not dataset[i]['answers']['text']:
-                continue
+        return dataloader
 
-            context = dataset[i]['context']
-            question = dataset[i]['question']
+    @staticmethod
+    def _get_correct_alignement(context, answer):
+        """ Some original examples in SQuAD have indices wrong by 1 or 2 character. We test and fix this here. """
+        gold_text = answer['text'][0]
+        start_idx = answer['answer_start'][0]
+        end_idx = start_idx + len(gold_text)
+        if context[start_idx:end_idx] == gold_text:
+            return start_idx, end_idx  # When the gold label position is good
+        elif context[start_idx - 1:end_idx - 1] == gold_text:
+            return start_idx - 1, end_idx - 1  # When the gold label is off by one character
+        elif context[start_idx - 2:end_idx - 2] == gold_text:
+            return start_idx - 2, end_idx - 2  # When the gold label is off by two character
+        else:
+            raise ValueError()
 
-            question_context = self.tokenizer(
-                context,
-                question,
-                padding='max_length',
-                truncation='only_first',
-                return_tensors='pt'
-            )
+    def _convert_to_features(self, example_batch):
+        # Tokenize contexts and questions (as pairs of inputs)
+        input_pairs = list(zip(example_batch['context'], example_batch['question']))
+        encodings = self.tokenizer.batch_encode_plus(input_pairs, pad_to_max_length=True, return_token_type_ids=True)
 
-            answer = dataset[i]['answers']['text'][0]
-            answer_start = dataset[i]['answers']['answer_start'][0]
+        # Compute start and end tokens for labels using Transformers's fast tokenizers alignement methodes.
+        start_positions, end_positions = [], []
+        for i, (context, answer) in enumerate(zip(example_batch['context'], example_batch['answers'])):
+            start_idx, end_idx = self._get_correct_alignement(context, answer)
+            start_positions.append(encodings.char_to_token(i, start_idx))
+            end_positions.append(encodings.char_to_token(i, end_idx - 1))
+        encodings.update({'start_positions': start_positions,
+                          'end_positions': end_positions})
 
-            answer_token_start = len(self.tokenizer(context[:answer_start])['input_ids'])-2
-            answer_token_end = answer_token_start + len(self.tokenizer(answer)['input_ids'])-2
+        return encodings
 
-            answer_span = torch.tensor([answer_token_start, answer_token_end])
 
-            self.questions_contexts.append(question_context)
-            self.answers_span.append(answer_span)
 
-    def __len__(self):
-        return len(self.answers)
 
-    def __getitem__(self, idx):
-        return self.questions_contexts[idx], self.answers[idx]
+
