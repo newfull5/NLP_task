@@ -2,6 +2,7 @@ from datasets import load_dataset
 from transformers import AutoTokenizer
 from torch.utils.data import Dataset
 from torch import nn
+import torch
 
 # datasets = load_dataset('ag_news')
 # train_set: 120K -> train_set: 100K, valid_set: 20K
@@ -23,8 +24,8 @@ class NewsDataset(Dataset):
             label = datasets['test']['label']
 
         elif stage == 'valid':
-            text = datasets['valid']['text'][:20000]
-            label = datasets['valid']['label'][:20000]
+            text = datasets['train']['text'][:20000]
+            label = datasets['train']['label'][:20000]
 
         elif stage == 'train':
             text = datasets['train']['text'][20000:]
@@ -40,8 +41,9 @@ class NewsDataset(Dataset):
     def _preproc_text(self, text):
         tokenized = self.tokenizer(
             text=text,
-            padding=True,
-            truncation=True, return_tensors='pt'
+            padding='max_length',
+            truncation=True,
+            return_tensors='pt'
         )
         return tokenized
 
