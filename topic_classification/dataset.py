@@ -3,18 +3,10 @@ from transformers import AutoTokenizer
 from torch.utils.data import Dataset
 from torch import nn
 
+# datasets = load_dataset('ag_news')
 # train_set: 120K -> train_set: 100K, valid_set: 20K
 # test_set: 7.6K
 # label: World(0), Sports(1), Business(2), Sci/Tech(3)
-tokenizer = AutoTokenizer.from_pretrained('roberta_base')
-
-datasets = load_dataset('ag_news')
-
-valid_text = datasets['train']['text'][:20000]
-valid_label = datasets['train']['label'][:20000]
-
-train_text = datasets['train']['text'][20000:]
-train_label = datasets['train']['label'][20000:]
 
 
 class NewsDataset(Dataset):
