@@ -1,5 +1,6 @@
 from torch.cuda.amp import autocast, GradScaler
 from torch import optim
+from tqdm import tqdm
 import torch
 import wandb
 
@@ -17,8 +18,8 @@ class Trainer:
         self.model.train()
         scaler = GradScaler()
 
-        for batch in self.train_loader:
-            batch = batch.to(self.device)
+        for batch in tqdm(self.train_loader, desc=f'train_epoch: {epoch}'):
+            batch = self.move_to_cuda(batch)
 
             with autocast():
                 outputs = self.model(batch)
@@ -37,10 +38,19 @@ class Trainer:
     def _valid_epoch(self, epoch):
         self.model.eval()
         with torch.no_grad():
-            for batch in self.valid_loader:
-                batch = batch.to(self.device)
+            for batch in tqdm(self.valid_loader, desc=f'train_epoch: {epoch}'):
                 outputs = self.model(batch)
                 wandb.log({'val_loss': outputs.loss})
+
+    def move_to_cuda(self, inputs):
+        if torch.is_tensor(inputs):
+            return inputs.cuda()
+        elif isinstance(inputs, list):
+            return [self.move_to_cuda(x) for x in inputs]
+        elif isinstance(inputs, dict):
+            return {key: self.move_to_cuda(value) for key, value in inputs.items()}
+        else:
+            return inputs
 
     def fit(self, max_epochs):
         for epoch in range(max_epochs):

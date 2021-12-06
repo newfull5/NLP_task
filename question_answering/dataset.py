@@ -12,8 +12,7 @@ class Dataset:
         self.stage = stage
         self.batch_size = batch_size
         self.dataset_name = dataset_name
-        self.questions_contexts = []
-        self.answers_span = []
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.columns_to_return = ['input_ids', 'token_type_ids', 'attention_mask', 'start_positions', 'end_positions']
 
     def preproc_dataset(self):
@@ -51,6 +50,7 @@ class Dataset:
             start_idx, end_idx = self._get_correct_alignement(context, answer)
             start_positions.append(encodings.char_to_token(i, start_idx))
             end_positions.append(encodings.char_to_token(i, end_idx - 1))
+
         encodings.update({'start_positions': start_positions,
                           'end_positions': end_positions})
 

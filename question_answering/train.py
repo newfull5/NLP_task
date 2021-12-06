@@ -4,6 +4,7 @@ from model import Model
 from dataset import Dataset
 from trainer import Trainer
 
+
 def _get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", type=str, default="roberta-base")
@@ -45,4 +46,4 @@ if __name__ == '__main__':
         valid_loader=valid_dataloader
     )
 
-    trainer.fit()
+    trainer.fit(max_epochs=3)
