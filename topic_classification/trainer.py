@@ -4,7 +4,7 @@ from torch import optim
 import torch.nn as nn
 import torch
 import wandb
-
+ 
 
 class Trainer:
     def __init__(self, model, train_loader, valid_loader, val_check_interval, lr):
