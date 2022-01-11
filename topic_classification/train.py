@@ -20,7 +20,7 @@ def _get_parser():
     return parser
 
 
-if __name__ =='__main__':
+if __name__ == '__main__':
     parser = _get_parser()
     args = parser.parse_args()
 
@@ -56,7 +56,7 @@ if __name__ =='__main__':
         model=model,
         train_loader=train_dataloader,
         valid_loader=valid_dataloader,
-        val_check_interval=1,
+        val_check_step=2000,
         lr=args.lr
     )
 

@@ -10,7 +10,6 @@ class Model(nn.Module):
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=1)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.save_dir = save_dir
-        self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, batch):
         inputs, labels = batch
