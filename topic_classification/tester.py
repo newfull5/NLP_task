@@ -24,6 +24,7 @@ class Tester:
         self._confusion_matrix()
         self._f1_score()
         self._accuracy()
+        self._macro_average()
         print(self.score)
 
     def _confusion_matrix(self):
@@ -58,10 +59,17 @@ class Tester:
             self.score[class_num]['recall'] = recall
             self.score[class_num]['f1_score'] = f1_score
 
+    def _macro_average(self):
+        self.score['macro_average'] = {}
+        for metric in ['precision', 'recall', 'f1_score']:
+            self.score['macro_average'][metric] = sum(
+                [self.score[class_num][metric] for class_num in range(self.args.num_labels)]
+            ) / self.args.num_labels
+
     def _accuracy(self):
         cnt = 0
         for i in range(len(self.pred)):
-            if self.pred[i] == self.labels:
+            if self.pred[i] == self.labels[i]:
                 cnt += 1
 
         self.score['accuracy'] = cnt / len(self.pred)
