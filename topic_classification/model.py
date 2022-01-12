@@ -7,9 +7,10 @@ import torch
 class Model(nn.Module):
     def __init__(self, model_name, save_dir):
         super(Model, self).__init__()
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=1)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=4)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.save_dir = save_dir
+        self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, batch):
         inputs, labels = batch
@@ -20,10 +21,10 @@ class Model(nn.Module):
         outputs = self.model(
             input_ids=inputs["input_ids"],
             attention_mask=inputs["attention_mask"],
-            labels=labels
         )
+        loss = self.criterion(outputs.logits, labels)
 
-        return outputs
+        return outputs.logits, loss
 
     def _move_to_cuda(self, inputs):
         if torch.is_tensor(inputs):
@@ -40,5 +41,5 @@ class Model(nn.Module):
 
     def load(self):
         self.model.load_state_dict(
-            torch.load(self.save_dir+'pytorch_model.bin', map_location=torch.device(self.device))
+            torch.load(self.save_dir + 'pytorch_model.bin', map_location=torch.device(self.device))
         )

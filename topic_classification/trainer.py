@@ -1,10 +1,9 @@
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 from torch import optim
-import torch.nn as nn
 import torch
 import wandb
- 
+
 
 class Trainer:
     def __init__(self, model, train_loader, valid_loader, val_check_step, lr):
@@ -24,18 +23,19 @@ class Trainer:
         total_train_loss = 0
         for batch in tqdm(self.train_loader, desc=f'train_epoch: {epoch}'):
             with autocast():
-                outputs = self.model(batch)
+                logits, loss = self.model(batch)
 
             self.optimizer.zero_grad()
-            scaler.scale(outputs.loss).backward()
+            scaler.scale(loss).backward()
             scaler.step(self.optimizer)
             scaler.update()
             train_steps += 1
-            total_train_loss += float(outputs.loss)
+            total_train_loss += float(loss)
 
-        if train_steps % self.val_check_step == 0:
-            wandb.log({'train_loss': total_train_loss / train_steps})
-            self._valid_epoch(epoch)
+            if train_steps % self.val_check_step == 0:
+                wandb.log({'train_loss': total_train_loss / train_steps})
+                self._valid_epoch(epoch)
+                self.model.save(f"epoch_{epoch}_steps_{train_steps}")
 
     def _valid_epoch(self, epoch):
         self.model.eval()
@@ -43,8 +43,8 @@ class Trainer:
         val_steps = 0
         with torch.no_grad():
             for batch in tqdm(self.valid_loader, desc='valid stage'):
-                outputs = self.model(batch)
-                total_val_loss += float(outputs.loss)
+                logits, loss = self.model(batch)
+                total_val_loss += float(loss)
                 val_steps += 1
 
         wandb.log({
