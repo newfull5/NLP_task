@@ -45,4 +45,4 @@ python3 train.py --model_name MODEL_NAME \
 - batch_size = 8
 - device: P100 x 1 (Colab)
 - lr = 3e-5 (no warmup, no scheduling)
-- 
+- mixed_precision

@@ -2,7 +2,7 @@
 
 ## Topic Classification
 
-- model: roberta-base
+- model: [roberta-base](https://huggingface.co/roberta-base)
 - datasets = [ag_news](https://huggingface.co/datasets/ag_news)
 - train_set: 120K -> train_set: 100K, valid_set: 20K
 - test_Set: 7.6K
