@@ -32,8 +32,8 @@ tokenizer = AutoTokenizer.from_pretrained('roberta-base')
   - I-LOC (6)
 
 ```python3
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForTokenClassification, AutoTokenizer
 
-model = AutoModelForSequenceClassification.from_pretrained('dhtocks/Topic-Classification')
+model = AutoModelForTokenClassification.from_pretrained('dhtocks/dhtocks/Named-Entity-Recognition')
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 ```

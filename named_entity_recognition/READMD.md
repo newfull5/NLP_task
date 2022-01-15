@@ -21,9 +21,9 @@
 ## Usage
 
 ```python3
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForTokenClassification, AutoTokenizer
 
-model = AutoModelForSequenceClassification.from_pretrained('dhtocks/Named-Entity-Recognition')
+model = AutoModelForTokenClassification.from_pretrained('dhtocks/Named-Entity-Recognition')
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 ```
 
