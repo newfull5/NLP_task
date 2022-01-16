@@ -12,7 +12,7 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 model = AutoModelForSequenceClassification.from_pretrained('dhtocks/Topic-Classification')
-tokenizer = AutoTokenizer.from_pretrained('roberta-base')
+tokenizer = AutoTokenizer.from_pretrained('roberta-base') 
 ```
 
 ## Named Entity Recognition
