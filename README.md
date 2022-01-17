@@ -34,6 +34,6 @@ tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 ```python3
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
-model = AutoModelForTokenClassification.from_pretrained('dhtocks/dhtocks/Named-Entity-Recognition')
+model = AutoModelForTokenClassification.from_pretrained('dhtocks/Named-Entity-Recognition')
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 ```
