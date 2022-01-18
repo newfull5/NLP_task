@@ -37,3 +37,4 @@ from transformers import AutoModelForTokenClassification, AutoTokenizer
 model = AutoModelForTokenClassification.from_pretrained('dhtocks/Named-Entity-Recognition')
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 ```
+ 
