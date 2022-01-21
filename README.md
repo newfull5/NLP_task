@@ -9,7 +9,7 @@
 - label: World(0), Sports(1), Business(2), Sci/Tech(3)
 
 ```python3
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer 
 
 model = AutoModelForSequenceClassification.from_pretrained('dhtocks/Topic-Classification')
 tokenizer = AutoTokenizer.from_pretrained('roberta-base') 
