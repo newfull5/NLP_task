@@ -14,7 +14,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 model = AutoModelForSequenceClassification.from_pretrained('dhtocks/Topic-Classification')
 tokenizer = AutoTokenizer.from_pretrained('roberta-base') 
 ```
-
+ 
 ## Named Entity Recognition
 
 - model: [roberta-base](https://huggingface.co/roberta-base)
